@@ -1,0 +1,46 @@
+group 'toby'
+
+buildscript {
+    ext {
+        springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+    }
+
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.spring.io/snapshot" }
+        maven { url "https://repo.spring.io/milestone" }
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+
+jar {
+    baseName = 'toby.live010'
+    version = '0.0.1-SNAPSHOT'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "http://central.maven.org/maven2/" }
+    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url 'https://oss.jfrog.org/libs-snapshot' }  // RxNetty 0.5.x snapshots
+
+}
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('io.netty:netty-all:4.1.6.Final')
+    compileOnly "org.projectlombok:lombok:1.16.10"
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+}
