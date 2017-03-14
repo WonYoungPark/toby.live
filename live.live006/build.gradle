@@ -41,7 +41,7 @@ repositories {
 
 dependencies {
 
-    compile('org.springframework.boot.experimental:spring-boot-starter-web-reactive')
+    compile('org.springframework.boot.experimental:spring-boot-starter-web-reactive:0.1.0.BUILD-SNAPSHOT')
     compileOnly "org.projectlombok:lombok:1.16.10"
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

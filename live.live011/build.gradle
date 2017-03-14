@@ -20,13 +20,12 @@ apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 
 jar {
-    baseName = 'toby.live007'
+    baseName = 'toby.live011'
     version = '0.0.1-SNAPSHOT'
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-
 
 repositories {
     mavenLocal()
@@ -40,14 +39,8 @@ repositories {
 }
 
 dependencies {
-
-    compile('org.springframework.boot.experimental:spring-boot-starter-web-reactive:0.1.0.BUILD-SNAPSHOT')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('io.netty:netty-all:4.1.6.Final')
     compileOnly "org.projectlombok:lombok:1.16.10"
     testCompile('org.springframework.boot:spring-boot-starter-test')
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.boot.experimental:spring-boot-dependencies-web-reactive:0.1.0.BUILD-SNAPSHOT"
-    }
 }

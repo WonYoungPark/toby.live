@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.Netty4ClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -30,18 +31,39 @@ public class TobyTV010Application {
         int nioEventLoopCnt = 1;
         AsyncRestTemplate rt = new AsyncRestTemplate(
                 new Netty4ClientHttpRequestFactory(new NioEventLoopGroup(nioEventLoopCnt)));
-        String URL = "http://localhost:8081/service?req={req}";
+        String URL1 = "http://localhost:8081/service?req={req}";
         String URL2 = "http://localhost:8081/service2?req={req}";
         @Autowired MyService myService;
+
+        boolean useFunction = true;
 
         @GetMapping("rest")
         public DeferredResult<String> rest(int idx) {
             DeferredResult<String> dr = new DeferredResult<>();
-            Completion.from(rt.getForEntity(URL, String.class, "hello" + idx))
-                    .andApply(s -> rt.getForEntity(URL2, String.class, s.getBody()))
-                    .andApply(s -> myService.work(s.getBody()))
-                    .andError(e -> dr.setErrorResult(e.toString()))
-                    .addAccept(dr::setResult);
+
+            if (!useFunction)
+            {
+                ListenableFuture<ResponseEntity<String>> f1 = rt.getForEntity(URL1, String.class, "hello" + idx);
+                f1.addCallback((ResponseEntity<String> s) -> {
+                    ListenableFuture<ResponseEntity<String>> f2 = rt.getForEntity(URL2, String.class, s.getBody());
+                    f2.addCallback((ResponseEntity<String> s2) -> {
+
+                        ListenableFuture<String> f3 = myService.work(s2.getBody());
+                        f3.addCallback(s3-> dr.setResult(s3)
+                        , e-> dr.setErrorResult(e.getMessage())
+                        );
+                    }, e-> dr.setErrorResult(e.getMessage()));
+                }, e->dr.setErrorResult(e.getMessage()));
+            }
+
+            if (useFunction)
+            {
+                Completion.from(rt.getForEntity(URL1, String.class, "hello" + idx))
+                        .andApply(s -> rt.getForEntity(URL2, String.class, s.getBody()))
+                        .andApply(s -> myService.work(s.getBody()))
+                        .andError(e -> dr.setErrorResult(e.toString()))
+                        .addAccept(dr::setResult);
+            }
             return dr;
         }
     }

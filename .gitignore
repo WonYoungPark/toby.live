@@ -26,3 +26,4 @@ nbdist/
 
 # maven
 target/
+/classes/
